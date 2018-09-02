@@ -1,0 +1,75 @@
+Puppet & Ubuntu 16.04
+
+	#download config for sources.list
+	curl -O https://apt.puppetlabs.com/puppetlabs-release-pc1-xenial.deb
+	
+	sudo dpkg -i puppetlabs-release-pc1-xenial.deb
+	sudo apt-get update
+	#installing the puppetserver package:
+	sudo apt-get install puppetserver
+
+	#updating PATH environment for convience
+	export PATH=$PATH:/opt/puppetlabs/bin
+	
+	#enable puppet master process and ensure it's running (aka systemctl start puppetserver && systemctl enable puppetserver)
+	puppet resource service puppetserver ensure=running enable=true 
+	#disable agent process and ensure it's stoppped(aka systemctl stop puppet && systemctl disable puppet)
+	puppet resource service puppet ensure=stopped enable=false
+	
+	# Puppet modules
+	#https://forge.puppet.com/
+	
+	#Direct link to motd module:
+	#https://forge.puppet.com/puppetlabs/motd
+	
+	puppet module install puppetlabs-motd --version 1.9.0
+	
+	puppet apply --noop -e "include motd"
+	
+    puppet apply -e "include motd"
+	
+	cd /etc/puppetlabs/code/environments/production/modules
+	
+	puppet module generate --skip-interview test-motdsetup
+	
+	vim motdsetup/manifest/init.pp
+	
+	class { 'motd':
+		content => "Hello world!/n",
+          }
+
+    puppet parser validate motdsetup/manifest/init.pp
+	
+	cd /etc/puppetlabs/code/environments/production/manifests/
+		  
+    node "puppet.local" {
+	   include motdsetup 
+	}
+	
+
+    # Adding reference action to install and run apache service enabling rewrite module
+    
+	cat motdsetup/manifest/init.pp	
+	
+	class motdsetup {
+
+	# install apache
+	package { "apache2":
+	  ensure => present,
+	}
+
+	service { 'apache2':
+	  ensure => running,
+	  enable => true,
+	}
+
+	  # ensures that mode_rewrite is loaded and modifies the default configuration file
+	  file { "/etc/apache2/mods-enabled/rewrite.load":
+		ensure => link,
+		target => "/etc/apache2/mods-available/rewrite.load",
+	  }
+
+
+	class { 'motd':
+	  content => "Hello world!\n"
+	}
