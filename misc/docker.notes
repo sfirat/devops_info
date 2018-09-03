@@ -1,0 +1,110 @@
+#1) Hello-world in docker way 
+
+docker run hello-world
+
+docker run -it ubuntu /bin/bash
+
+docker images
+
+ls /var/lib/docker/image/overlay/imagedb/content/sha256
+
+cat file_$md5_hash | python -m json.tool
+
+docker inspect ubuntu
+
+docker run -it ubuntu /bin/bash
+
+  echo test > /home/test.file
+  exit
+  
+docker run -it ubuntu /bin/bash
+
+  cat /home/test.file
+  
+docker start $container
+docker attach $container  
+
+docker container prune -f
+
+docker images
+
+FROM scratch
+COPY hello
+CMD ["/hello"]
+
+docker build .
+
+docker rmi $hash
+
+docker build -t greetings
+docker run greetings
+
+Container ==> Image
+
+docker run -it ubuntu /bin/bash
+
+apt-get update
+apt-get install -y python
+
+docker images
+docker ps -a
+
+docker commit $hash ubuntu_python
+docker run ubuntu_python
+docker rm $hash
+docker rmi ubuntu_python
+
+docker commit --change='CMD ["python","-c","import this"] ' $hash ubuntu_python
+docker run ubuntu_python
+
+
+****Portmapping*****
+docker build -t webapp
+docker run webapp
+docker run -d webapp
+
+docker inspect $container|grep IP
+
+curl http://IP:8080
+
+docker stop $container|grep
+
+#Assign host port dynamically
+docker run -d -P webapp
+
+docker stop
+docker container prune
+
+#Predefine mapping host=>container
+docker run -d -p 3000:8080 webapp
+
+****Networking****
+docker network ls
+docker build -t ubuntu_networking .
+docker run -it ubuntu_networking
+
+ ip address show
+     Ctrl+p   Ctrl+q
+	 
+ping 172.17.0.2
+docker run -it ubuntu_networking 
+   arp-scan --interface=eth0 --localnet
+ 
+docker run -d --network=host ubuntu_networking
+curl http://localhost:8080 
+
+docker run -it --network=none ubuntu_networking
+   ip address show
+
+   
+***Volumes****
+docker build -t scratch_volume .
+3x   docker run -d --mount type=bind,source="/var/demo/logs",destination="/logs" scratch volume
+
+cat /var/demo/logs/myapp | cut -d" " -f2
+
+docker run -d --mount type=volume,src=logs,dst=/logs
+docker volume ls
+docker volume inspect logs
+
+docker run -d --mount type=tmpfs,dst=/logs 
