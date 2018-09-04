@@ -1,0 +1,37 @@
+
+#Creating Vbox VMs
+docker-machine create --driver virtualbox myvm1 
+
+docker-machine create --driver virtualbox myvm2
+
+#Docker Swarm initialization
+docker-machine ssh myvm1 "docker swarm init --advertise-addr <myvm1 ip>"
+
+$ docker-machine ssh myvm2 "docker swarm join \
+--token <token> \
+<ip>:2377"
+
+#Building friendlyhello image locally for VM1
+& "C:\Program Files\Docker\Docker\Resources\bin\docker-machine.exe" env myvm1 | Invoke-Expression
+
+docker build -t friendlyhello . 
+
+#Building friendlyhello image locally for VM2
+& "C:\Program Files\Docker\Docker\Resources\bin\docker-machine.exe" env myvm2 | Invoke-Expression
+
+docker build -t friendlyhello . 
+
+#Deploying the first stack to running swarm cluster
+docker stack deploy -c docker-compose.yml getstartedlab
+
+#Redeploy with visualizer container
+docker stack deploy -c docker-compose-visual.yml getstartedlab
+
+#Redeploy with redis container and resource limits
+docker stack deploy -c docker-compose-persist.yml getstartedlab
+
+#Check state
+docker stack ps getstartedlab
+
+#Remove services
+docker stack rm getstartedlab
